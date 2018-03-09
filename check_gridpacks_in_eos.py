@@ -236,7 +236,7 @@ for prepid in requests:
 	os.system('grep _CONDOR_SCRATCH_DIR '+my_path+'/'+prepid+'/'+'mgbasedir/Template/LO/SubProcesses/refine.sh')
         os.system('grep "= ickkw" '+my_path+'/'+prepid+'/'+'process/madevent/Cards/run_card.dat')
 	os.system('echo "------------------------------------"')
-
+	os.system('rm '+prepid)
 ##########################################
 ######## END LOOP OVER PREPIDS ###########
 ##########################################

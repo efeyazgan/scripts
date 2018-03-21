@@ -22,7 +22,7 @@ for prepid in requests:
         os.system('mkdir -p '+my_path+'/'+prepid)
         os.chdir(my_path+'/'+prepid)
         os.system('wget -q https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+prepid+' -O '+prepid)
-        gridpack_cvmfs_path = os.popen('grep \/cvmfs '+prepid).read()
+        gridpack_cvmfs_path = os.popen('grep \/cvmfs '+prepid+'| grep -v \'#args\' ').read()
         gridpack_cvmfs_path = gridpack_cvmfs_path.split('\'')[1]
 #       print type(gridpack_cvmfs_path)
         gridpack_eos_path = gridpack_cvmfs_path.replace("/cvmfs/cms.cern.ch/phys_generator","/eos/cms/store/group/phys_generator/cvmfs")

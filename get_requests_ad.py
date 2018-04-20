@@ -12,12 +12,12 @@ mcm = restful(dev=True)
 
 #PhaseIISummer17wmLHEGENOnly, RunIISummer15wmLHEGS
 page = 0
-res = mcm.getA('requests',query='member_of_campaign=RunIIFall17wmLHEGS&dataset_name=*powheg*&status=submitted', page=page)
+res = mcm.getA('requests',query='member_of_campaign=RunIIFall17wmLHEGS&dataset_name=*powheg*JHUGen*&status=submitted', page=page)
 while len(res) != 0:
     for r in res:
         if "NLO" not in r['dataset_name']:
 #            print ("'"+r['prepid']+"',")
             print ("'"+r['prepid']+"',",r['dataset_name'])# print(r['prepid']+',')
     page += 1
-    res = mcm.getA('requests',query='member_of_campaign=RunIIFall17wmLHEGS&dataset_name=*powheg*&status=submitted', page=page)
+    res = mcm.getA('requests',query='member_of_campaign=RunIIFall17wmLHEGS&dataset_name=*powheg*JHUGen*&status=submitted', page=page)
     time.sleep(0.5)

@@ -4,7 +4,7 @@ sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 
 from rest import *
 
-mcm = restful(dev=True)
+mcm = restful(dev=False)
 
 # example to search  ALL requesst which are member of a campaign
 # it uses a generic search for specified columns: query='status=submitted'

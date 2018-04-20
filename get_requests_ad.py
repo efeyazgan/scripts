@@ -1,5 +1,6 @@
 import os,sys,time
 os.system('source /afs/cern.ch/cms/PPD/PdmV/tools/McM/getCookie.sh')
+os.system('cern-get-sso-cookie -u https://cms-pdmv.cern.ch/mcm/ -o ~/private/prod-cookie.txt --krb --reprocess')
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 
 from rest import *

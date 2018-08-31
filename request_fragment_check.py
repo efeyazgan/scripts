@@ -20,4 +20,4 @@ for r in res:
         print powheg_check
         powheg_check = int(powheg_check)
         if powheg_check == 0 :
-            print "Wrong fragment: powheg in dataset name but MCatNLO settings in fragment"
+            print "Wrong fragment: powheg in dataset name but no pythia8PowhegEmissionVetoSettings in fragment"

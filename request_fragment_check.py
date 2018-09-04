@@ -9,8 +9,9 @@ from itertools import groupby
 
 mcm = McM(dev=True)
 
-res = mcm.get('requests', query='prepid=TOP-RunIISummer15wmLHEGS-00023')
-#res = mcm.get('requests', query='prepid=HIG-RunIIFall17wmLHEGS-01083')
+#res = mcm.get('requests', query='prepid=TOP-RunIISummer15wmLHEGS-00023') # powheg
+#res = mcm.get('requests', query='prepid=HIG-RunIIFall17wmLHEGS-01083') # no matching madgraph
+res = mcm.get('requests', query='prepid=HIG-RunIISummer15wmLHEGS-02182') #fxfx
 
 my_path =  '/tmp/'+os.environ['USER']+'/gridpacks/'
 
@@ -24,22 +25,36 @@ for r in res:
     check = []
     ME = ["PowhegEmissionVeto","aMCatNLO"]
     MEname = ["powheg","madgraph","mcatnlo"]
-    matching = 1
+    matching = 10
+    ickkw = 'del'
     for ind, word in enumerate(MEname):
+        print ind, word
         if word in dn.lower() :
+            check.append(int(os.popen('grep -c pythia8'+ME[ind]+'Settings '+pi).read()))
+            check.append(int(os.popen('grep -c "from Configuration.Generator.Pythia8'+ME[ind]+'Settings_cfi import *" '+pi).read()))
+            check.append(int(os.popen('grep -c "pythia8'+ME[ind]+'SettingsBlock," '+pi).read()))
             if ind > 0 :
                  os.system('wget -q https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O '+my_path+'/'+pi+'/'+pi)
                  gridpack_cvmfs_path = os.popen('grep \/cvmfs '+my_path+'/'+pi+'/'+pi+'| grep -v \'#args\' ').read()
                  gridpack_cvmfs_path = gridpack_cvmfs_path.split('\'')[1]
                  os.system('tar xf '+gridpack_cvmfs_path+' -C'+my_path+'/'+pi)
-                 ickkw = str(os.system('grep "= ickkw" '+my_path+'/'+pi+'/'+'process/madevent/Cards/run_card.dat'))
+                 fname = my_path+'/'+pi+'/'+'process/madevent/Cards/run_card.dat'
+                 fname2 = my_path+'/'+pi+'/'+'process/Cards/run_card.dat'
+                 if os.path.isfile(fname) is True :
+                     ickkw = str(os.system('grep "= ickkw" '+fname))
+                 elif os.path.isfile(fname2) is True :    
+                     ickkw = str(os.system('grep "= ickkw" '+fname2))
+                     print("icckw "+ickkw)
+                 print("icckw "+ickkw)
                  matching = int(string.split(ickkw," ")[-1])
-            check.append(int(os.popen('grep -c pythia8'+ME[ind]+'Settings '+pi).read()))
-            check.append(int(os.popen('grep -c "from Configuration.Generator.Pythia8'+ME[ind]+'Settings_cfi import *" '+pi).read()))
-            check.append(int(os.popen('grep -c "pythia8'+ME[ind]+'SettingsBlock," '+pi).read()))
-            if matching > 0 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
+                 print(matching)
+                 print
+#            check.append(int(os.popen('grep -c pythia8'+ME[ind]+'Settings '+pi).read()))
+#            check.append(int(os.popen('grep -c "from Configuration.Generator.Pythia8'+ME[ind]+'Settings_cfi import *" '+pi).read()))
+#            check.append(int(os.popen('grep -c "pythia8'+ME[ind]+'SettingsBlock," '+pi).read()))
+            if matching >= 2 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
                 print "no known inconsistency in the fragment w.r.t. the name of the dataset "+word
-            elif matching == 0 and check[0] == 0 and check[1] == 0 and check[2] == 0 :    
+            elif matching < 2 and check[0] == 0 and check[1] == 0 and check[2] == 0 :    
                 print "no known inconsistency in the fragment w.r.t. the name of the dataset "
             else:     
                 print "Wrong fragment: "+word+" in dataset name but settings in fragment not correct or vice versa"

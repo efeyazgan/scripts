@@ -1,4 +1,4 @@
-import os,sys,time,string
+import os,sys,time,string,re
 os.system('source /afs/cern.ch/cms/PPD/PdmV/tools/McM/getCookie.sh')
 os.system('cern-get-sso-cookie -u https://cms-pdmv.cern.ch/mcm/ -o ~/private/prod-cookie.txt --krb --reprocess')
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
@@ -9,9 +9,9 @@ from itertools import groupby
 
 mcm = McM(dev=True)
 
-#res = mcm.get('requests', query='prepid=TOP-RunIISummer15wmLHEGS-00023') # powheg
+res = mcm.get('requests', query='prepid=TOP-RunIISummer15wmLHEGS-00023') # powheg
 #res = mcm.get('requests', query='prepid=HIG-RunIIFall17wmLHEGS-01083') # no matching madgraph
-res = mcm.get('requests', query='prepid=HIG-RunIISummer15wmLHEGS-02182') #fxfx
+#res = mcm.get('requests', query='prepid=HIG-RunIISummer15wmLHEGS-02182') #fxfx
 
 my_path =  '/tmp/'+os.environ['USER']+'/gridpacks/'
 
@@ -28,11 +28,14 @@ for r in res:
     matching = 10
     ickkw = 'del'
     for ind, word in enumerate(MEname):
-        print ind, word
         if word in dn.lower() :
-            check.append(int(os.popen('grep -c pythia8'+ME[ind]+'Settings '+pi).read()))
-            check.append(int(os.popen('grep -c "from Configuration.Generator.Pythia8'+ME[ind]+'Settings_cfi import *" '+pi).read()))
-            check.append(int(os.popen('grep -c "pythia8'+ME[ind]+'SettingsBlock," '+pi).read()))
+            if ind == 2 :
+                knd = 1 
+            else :
+                knd = ind
+            check.append(int(os.popen('grep -c pythia8'+ME[knd]+'Settings '+pi).read()))
+            check.append(int(os.popen('grep -c "from Configuration.Generator.Pythia8'+ME[knd]+'Settings_cfi import *" '+pi).read()))
+            check.append(int(os.popen('grep -c "pythia8'+ME[knd]+'SettingsBlock," '+pi).read()))
             if ind > 0 :
                  os.system('wget -q https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O '+my_path+'/'+pi+'/'+pi)
                  gridpack_cvmfs_path = os.popen('grep \/cvmfs '+my_path+'/'+pi+'/'+pi+'| grep -v \'#args\' ').read()
@@ -41,20 +44,15 @@ for r in res:
                  fname = my_path+'/'+pi+'/'+'process/madevent/Cards/run_card.dat'
                  fname2 = my_path+'/'+pi+'/'+'process/Cards/run_card.dat'
                  if os.path.isfile(fname) is True :
-                     ickkw = str(os.system('grep "= ickkw" '+fname))
+                     ickkw = os.popen('grep "= ickkw" '+fname).read()
                  elif os.path.isfile(fname2) is True :    
-                     ickkw = str(os.system('grep "= ickkw" '+fname2))
-                     print("icckw "+ickkw)
-                 print("icckw "+ickkw)
-                 matching = int(string.split(ickkw," ")[-1])
+                     ickkw = os.popen('grep "= ickkw" '+fname2).read()
+                 ickkw = str(ickkw)    
+                 matching = int(re.search(r'\d+',ickkw).group())
                  print(matching)
-                 print
-#            check.append(int(os.popen('grep -c pythia8'+ME[ind]+'Settings '+pi).read()))
-#            check.append(int(os.popen('grep -c "from Configuration.Generator.Pythia8'+ME[ind]+'Settings_cfi import *" '+pi).read()))
-#            check.append(int(os.popen('grep -c "pythia8'+ME[ind]+'SettingsBlock," '+pi).read()))
             if matching >= 2 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
                 print "no known inconsistency in the fragment w.r.t. the name of the dataset "+word
             elif matching < 2 and check[0] == 0 and check[1] == 0 and check[2] == 0 :    
-                print "no known inconsistency in the fragment w.r.t. the name of the dataset "
+                print "no known inconsistency in the fragment w.r.t. the name of the dataset "+word
             else:     
                 print "Wrong fragment: "+word+" in dataset name but settings in fragment not correct or vice versa"

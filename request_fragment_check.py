@@ -9,22 +9,25 @@ from itertools import groupby
 
 mcm = McM(dev=True)
 
-res = mcm.get('requests', query='prepid=TOP-RunIISummer15wmLHEGS-00023') # powheg
+#res = mcm.get('requests', query='prepid=TOP-RunIISummer15wmLHEGS-00023') # powheg
 #res = mcm.get('requests', query='prepid=HIG-RunIIFall17wmLHEGS-01083') # no matching madgraph
-#res = mcm.get('requests', query='prepid=HIG-RunIISummer15wmLHEGS-02182') #fxfx
+res = mcm.get('requests', query='prepid=HIG-RunIISummer15wmLHEGS-02182') #fxfx
 
 my_path =  '/tmp/'+os.environ['USER']+'/gridpacks/'
 
 for r in res:
     pi = r['prepid']
     dn = r['dataset_name']
-    print ("'"+r['prepid']+"',",r['dataset_name'])
+#    print ("'"+r['prepid']+"',",r['dataset_name'])
     print (pi)
     os.system('wget -q https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O '+pi)
     os.system('mkdir -p '+my_path+'/'+pi)
     check = []
+    tunecheck = []
     ME = ["PowhegEmissionVeto","aMCatNLO"]
     MEname = ["powheg","madgraph","mcatnlo"]
+    tunename = ["CP5","CUETP8M1"]
+    tune = ["CP5","CUEP8M1"] 
     matching = 10
     ickkw = 'del'
     for ind, word in enumerate(MEname):
@@ -49,10 +52,15 @@ for r in res:
                      ickkw = os.popen('grep "= ickkw" '+fname2).read()
                  ickkw = str(ickkw)    
                  matching = int(re.search(r'\d+',ickkw).group())
-                 print(matching)
             if matching >= 2 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
-                print "no known inconsistency in the fragment w.r.t. the name of the dataset "+word
+                print "* no known inconsistency in the fragment w.r.t. the name of the dataset "+word
             elif matching < 2 and check[0] == 0 and check[1] == 0 and check[2] == 0 :    
-                print "no known inconsistency in the fragment w.r.t. the name of the dataset "+word
+                print "* no known inconsistency in the fragment w.r.t. the name of the dataset "+word
             else:     
-                print "Wrong fragment: "+word+" in dataset name but settings in fragment not correct or vice versa"
+                print "* Wrong fragment: "+word+" in dataset name but settings in fragment not correct or vice versa"
+    for kk in range (0, 2):   
+        tunecheck.append(int(os.popen('grep -c -i '+tune[kk]+' '+pi).read()))
+    if tunecheck[0] != 3 and tunecheck[1] != 3 :
+        print "* Tune configuration wrong in the fragment"
+    elif tunecheck[0] == 3 or tunecheck[1] == 3 :
+        print "* Tune configuration probably OK in the fragment"

@@ -54,9 +54,11 @@ for r in res:
                  matching = int(re.search(r'\d+',ickkw).group())
             if matching >= 2 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
                 print "* no known inconsistency in the fragment w.r.t. the name of the dataset "+word
-            elif matching < 2 and check[0] == 0 and check[1] == 0 and check[2] == 0 :    
+            elif matching < 2 and check[0] == 0 and check[1] == 0 and check[2] == 0 :
                 print "* no known inconsistency in the fragment w.r.t. the name of the dataset "+word
-            else:     
+            elif matching == 0 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
+                print "* no known inconsistency in the fragment w.r.t. the name of the dataset "+word
+            else:
                 print "* Wrong fragment: "+word+" in dataset name but settings in fragment not correct or vice versa"
     for kk in range (0, 2):   
         tunecheck.append(int(os.popen('grep -c -i '+tune[kk]+' '+pi).read()))

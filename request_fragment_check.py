@@ -9,27 +9,43 @@ from itertools import groupby
 
 mcm = McM(dev=True)
 
-#res = mcm.get('requests', query='prepid=TOP-RunIISummer15wmLHEGS-00023') # powheg
-#res = mcm.get('requests', query='prepid=HIG-RunIIFall17wmLHEGS-01083') # no matching madgraph
-res = mcm.get('requests', query='prepid=HIG-RunIISummer15wmLHEGS-02182') #fxfx
+query_str = 'prepid='+str(sys.argv[1])
+res = mcm.get('requests', query=query_str)
 
 my_path =  '/tmp/'+os.environ['USER']+'/gridpacks/'
+
+print ""
+print "***********************************************************************************"
 
 for r in res:
     pi = r['prepid']
     dn = r['dataset_name']
-#    print ("'"+r['prepid']+"',",r['dataset_name'])
+    te = r['time_event']
+    totalevents = r['total_events']
+    cmssw = r['cmssw_release']
     print (pi)
+    for item in te:
+        timeperevent = float(item)
+    if timeperevent > 150.0 :
+        print "* [WARNING] Large time/event - please check"
+    if '10_2' not in cmssw and '9_3' not in cmssw and '7_1' not in cmssw :
+        print "* [WARNING] Are you sure you want to use "+cmssw+"release which is not standard"
+        print "*           which may not have all the necessary GEN code."
+    if totalevents >= 100000000 :
+        print "* [WARNING] Is "+totalevents+" events what you really wanted - please check!"
     os.system('wget -q https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O '+pi)
     os.system('mkdir -p '+my_path+'/'+pi)
     check = []
     tunecheck = []
+    psweightscheck = []
     ME = ["PowhegEmissionVeto","aMCatNLO"]
     MEname = ["powheg","madgraph","mcatnlo"]
     tunename = ["CP5","CUETP8M1"]
     tune = ["CP5","CUEP8M1"] 
     matching = 10
     ickkw = 'del'
+    if int(os.popen('grep -c eos '+pi).read()) == 1 :
+        print "* [ERROR] Gridpack should have used cvmfs path instead of eos path"
     for ind, word in enumerate(MEname):
         if word in dn.lower() :
             if ind == 2 :
@@ -53,16 +69,36 @@ for r in res:
                  ickkw = str(ickkw)    
                  matching = int(re.search(r'\d+',ickkw).group())
             if matching >= 2 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
-                print "* no known inconsistency in the fragment w.r.t. the name of the dataset "+word
-            elif matching < 2 and check[0] == 0 and check[1] == 0 and check[2] == 0 :
-                print "* no known inconsistency in the fragment w.r.t. the name of the dataset "+word
-            elif matching == 0 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
-                print "* no known inconsistency in the fragment w.r.t. the name of the dataset "+word
-            else:
-                print "* Wrong fragment: "+word+" in dataset name but settings in fragment not correct or vice versa"
+                print "* [OK] no known inconsistency in the fragment w.r.t. the name of the dataset "+word
+            elif matching < 2 and check[0] == 0 and check[1] == 0 and check[2] == 0 :    
+                print "* [OK] no known inconsistency in the fragment w.r.t. the name of the dataset "+word
+	    elif matching == 0 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
+		print "* [OK] no known inconsistency in the fragment w.r.t. the name of the dataset "+word
+            else:     
+                print "* [ERROR] May be wrong fragment: "+word+" in dataset name but settings in fragment not correct or vice versa"
+            if word == "powheg" :
+                print "* [WARNING] if this is a"+word+" sample but a loop induced process such as ggZH," 
+                print "*           then fragment is OK (no need to have Pythia8PowhegEmissionVetoSettings)"
     for kk in range (0, 2):   
         tunecheck.append(int(os.popen('grep -c -i '+tune[kk]+' '+pi).read()))
-    if tunecheck[0] != 3 and tunecheck[1] != 3 :
-        print "* Tune configuration wrong in the fragment"
-    elif tunecheck[0] == 3 or tunecheck[1] == 3 :
-        print "* Tune configuration probably OK in the fragment"
+    if tunecheck[0] < 3 and tunecheck[1] < 3 :
+        print "* [ERROR] Tune configuration wrong in the fragment"
+    elif tunecheck[0] > 2 or tunecheck[1] >2 :
+        print "* [OK] Tune configuration probably OK in the fragment"
+        if tunecheck[0] > 2 :
+            if 'Fall18' not in pi and 'Fall17' not in pi :
+                print "* [WARNING] Do you really want to have tune "+tunename[0] +" in this campaign?"
+    if 'Fall18' in pi :
+        if int(os.popen('grep -c "from Configuration.Generator.PSweightsPythia.PythiaPSweightsSettings_cfi import *" '+pi).read()) != 1 :
+            print "* [WARNING] No parton shower weights configuration in the fragment. In the Fall18 campaign, we recommend to include Parton Shower weights"
+        if int(os.popen('grep -c "from Configuration.Generator.PSweightsPythia.PythiaPSweightsSettings_cfi import *" '+pi).read()) == 1 :
+            psweightscheck.append(int(os.popen('grep -c "from Configuration.Generator.PSweightsPythia.PythiaPSweightsSettings_cfi import *" '+pi).read()))
+            psweightscheck.append(int(os.popen('grep -c "pythia8PSweightsSettingsBlock," '+pi).read()))
+            psweightscheck.append(int(os.popen('grep -c "pythia8PSweightsSettings" '+pi).read()))
+            if psweightscheck[0] == 1 and psweightscheck[1] == 1 and psweightscheck[2] == 2 :
+                print "* [OK] Parton shower weight configuration probably OK in the fragment"
+            else:
+                print "* [ERROR] Parton shower weight configuretion not OK in the fragment" 
+
+    print "***********************************************************************************"
+    print ""

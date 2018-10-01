@@ -85,7 +85,7 @@ for r in res:
                      ickkw = os.popen('grep "= ickkw" '+fname2).read()
                  ickkw = str(ickkw)    
                  matching = int(re.search(r'\d+',ickkw).group())
-            print (matching,check[0],check[1],check[2])     
+#            print (matching,check[0],check[1],check[2])     
             if matching >= 2 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
                 print "* [OK] no known inconsistency in the fragment w.r.t. the name of the dataset "+word
             elif matching == 1 and check[0] == 0 and check[1] == 0 and check[2] == 0 :    
@@ -112,6 +112,9 @@ for r in res:
         if int(os.popen('grep -c "from Configuration.Generator.PSweightsPythia.PythiaPSweightsSettings_cfi import *" '+pi).read()) != 1 :
             print "* [WARNING] No parton shower weights configuration in the fragment. In the Fall18 campaign, we recommend to include Parton Shower weights"
         if int(os.popen('grep -c "from Configuration.Generator.PSweightsPythia.PythiaPSweightsSettings_cfi import *" '+pi).read()) == 1 :
+	    if '10_2_3' not in cmssw :
+		"* [ERROR] PS weights in config but CMSSW version is not 10_2_3 - please check!"
+		exit() 		    
             psweightscheck.append(int(os.popen('grep -c "from Configuration.Generator.PSweightsPythia.PythiaPSweightsSettings_cfi import *" '+pi).read()))
             psweightscheck.append(int(os.popen('grep -c "pythia8PSweightsSettingsBlock," '+pi).read()))
             psweightscheck.append(int(os.popen('grep -c "pythia8PSweightsSettings" '+pi).read()))

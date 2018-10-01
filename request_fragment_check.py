@@ -24,18 +24,6 @@ for r in res:
     totalevents = r['total_events']
     cmssw = r['cmssw_release']
     print (pi)
-    for item in te:
-        timeperevent = float(item)
-    if timeperevent > 150.0 :
-        print "* [WARNING] Large time/event - please check"
-    if '10_2' not in cmssw and '9_3' not in cmssw and '7_1' not in cmssw :
-        print "* [WARNING] Are you sure you want to use "+cmssw+"release which is not standard"
-        print "*           which may not have all the necessary GEN code."
-    if totalevents >= 100000000 :
-        print "* [WARNING] Is "+totalevents+" events what you really wanted - please check!"
-    os.system('wget -q https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O '+pi)
-#    os.system('curl -f   https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi)
-    os.system('mkdir -p '+my_path+'/'+pi)
     check = []
     tunecheck = []
     psweightscheck = []
@@ -45,6 +33,29 @@ for r in res:
     tune = ["CP5","CUEP8M1"] 
     matching = 10
     ickkw = 'del'
+    for item in te:
+        timeperevent = float(item)
+    if timeperevent > 150.0 :
+        print "* [WARNING] Large time/event - please check"
+    if '10_2' not in cmssw and '9_3' not in cmssw and '7_1' not in cmssw :
+        print "* [WARNING] Are you sure you want to use "+cmssw+"release which is not standard"
+        print "*           which may not have all the necessary GEN code."
+    if totalevents >= 100000000 :
+        print "* [WARNING] Is "+totalevents+" events what you really wanted - please check!"
+#    os.system('wget --spider --server-response https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O - 2>&1 | sed -ne \'/Length/{s/.*: //;p}\'')
+    fsize = os.popen('wget --spider --server-response https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O - 2>&1 | sed -ne \'/Length/{s/.*: //;p}\'').read()
+    if 'unspecified' in fsize :
+        os.system('wget -q https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_test/'+pi+' -O '+pi)
+        gettest = os.popen('grep cff '+pi+' | grep curl').read()
+        for index, aword in enumerate(MEname):
+            if aword in dn.lower() :
+                print "* "+gettest
+                print "* [OK] Probably OK if the above hadronizer is what you intended to use"
+                print "***********************************************************************************"
+                print ""
+        exit()
+    os.system('wget -q https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O '+pi)
+    os.system('mkdir -p '+my_path+'/'+pi)
     if int(os.popen('grep -c eos '+pi).read()) == 1 :
         print "* [ERROR] Gridpack should have used cvmfs path instead of eos path"
     for ind, word in enumerate(MEname):

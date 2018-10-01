@@ -11,7 +11,11 @@ mcm = McM(dev=True)
 
 query_str = 'prepid='+str(sys.argv[1])
 res = mcm.get('requests', query=query_str)
-
+if len(res) == 0 :
+    print "***********************************************************************************"
+    print "Something's wrong - can not get the request parameters"
+    print "***********************************************************************************"
+    exit()
 
 my_path =  '/tmp/'+os.environ['USER']+'/gridpacks/'
 print ""

@@ -50,8 +50,10 @@ for r in res:
             if aword in dn.lower() :
                 print "* "+gettest
                 print "* [OK] Probably OK if the above hadronizer is what you intended to use"
-                print "***********************************************************************************"
-                print ""
+            else:
+                print "* [ERROR] Something may be wrong - name/hadronizer mismatch - please check!"
+        print "***********************************************************************************"
+        print ""
         exit()
     os.system('wget -q https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O '+pi)
     os.system('mkdir -p '+my_path+'/'+pi)

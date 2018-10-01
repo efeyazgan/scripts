@@ -18,4 +18,6 @@ ERRORS:
 * [ERROR] Gridpack should have used cvmfs path instead of eos path
 * [ERROR] May be wrong fragment: powheg/madgraph/mcatnlo in dataset name but settings in fragment not correct or vice versa"
 * [ERROR] Tune configuration wrong in the fragment"
-* [ERROR] Parton shower weight configuretion not OK in the fragment" 
+* [ERROR] Parton shower weight configuretion not OK in the fragment"
+
+The script also checks if there is no fragment there is a hadronizer used.  

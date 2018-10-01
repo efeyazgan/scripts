@@ -42,7 +42,6 @@ for r in res:
         print "*           which may not have all the necessary GEN code."
     if totalevents >= 100000000 :
         print "* [WARNING] Is "+totalevents+" events what you really wanted - please check!"
-#    os.system('wget --spider --server-response https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O - 2>&1 | sed -ne \'/Length/{s/.*: //;p}\'')
     fsize = os.popen('wget --spider --server-response https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O - 2>&1 | sed -ne \'/Length/{s/.*: //;p}\'').read()
     if 'unspecified' in fsize :
         os.system('wget -q https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_test/'+pi+' -O '+pi)

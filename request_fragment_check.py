@@ -12,8 +12,8 @@ mcm = McM(dev=True)
 query_str = 'prepid='+str(sys.argv[1])
 res = mcm.get('requests', query=query_str)
 
-my_path =  '/tmp/'+os.environ['USER']+'/gridpacks/'
 
+my_path =  '/tmp/'+os.environ['USER']+'/gridpacks/'
 print ""
 print "***********************************************************************************"
 
@@ -34,6 +34,7 @@ for r in res:
     if totalevents >= 100000000 :
         print "* [WARNING] Is "+totalevents+" events what you really wanted - please check!"
     os.system('wget -q https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi+' -O '+pi)
+#    os.system('curl -f   https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/'+pi)
     os.system('mkdir -p '+my_path+'/'+pi)
     check = []
     tunecheck = []
@@ -68,9 +69,11 @@ for r in res:
                      ickkw = os.popen('grep "= ickkw" '+fname2).read()
                  ickkw = str(ickkw)    
                  matching = int(re.search(r'\d+',ickkw).group())
+#            print (matching,check[0],check[1],check[2])     
             if matching >= 2 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
                 print "* [OK] no known inconsistency in the fragment w.r.t. the name of the dataset "+word
-            elif matching < 2 and check[0] == 0 and check[1] == 0 and check[2] == 0 :    
+#            elif matching < 2 and check[0] == 0 and check[1] == 0 and check[2] == 0 :    
+            elif matching == 1 and check[0] == 0 and check[1] == 0 and check[2] == 0 :    
                 print "* [OK] no known inconsistency in the fragment w.r.t. the name of the dataset "+word
 	    elif matching == 0 and check[0] == 2 and check[1] == 1 and check[2] == 1 :
 		print "* [OK] no known inconsistency in the fragment w.r.t. the name of the dataset "+word

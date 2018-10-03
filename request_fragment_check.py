@@ -7,7 +7,7 @@ from rest import McM
 from json import dumps
 from itertools import groupby
 
-mcm = McM(dev=True)
+mcm = McM(dev=False)
 
 query_str = 'prepid='+str(sys.argv[1])
 res = mcm.get('requests', query=query_str)

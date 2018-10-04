@@ -4,6 +4,8 @@
 
 python request_fragment_check.py [prepid in mcm]
 
+This script is now moved to https://github.com/cms-sw/genproductions/blob/master/bin/utils/request_fragment_check.py further updates will be made there. 
+
 This script currently checks for the following to give an *OK*, *WARNING*, or *ERROR*:
 
 WARNINGS:

@@ -1,3 +1,16 @@
+#python chal3.py 
+#gives:
+#Result:  8 + 9 = 17
+#Result:  3 + 9 = 12
+#Result:  4 + 8 = 12
+#Result:  2 + 9 = 11
+#Result:  3 + 8 = 11
+#Result:  -2 + 3 = 1
+#Result:  0 + 1 = 1
+#No pairs in this list sum up to 19
+#Result:  -2 + 1 = -1
+#No pairs in this list sum up to 1231233232
+
 def addtwo(A,tot):
         A = set(A)
         A = list(A)

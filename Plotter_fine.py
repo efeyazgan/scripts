@@ -1,6 +1,9 @@
 import ROOT
 import sys
 import os
+from ROOT import TCanvas, TFile, TProfile, TNtuple, TH1F, TH2F
+from ROOT import gROOT, gBenchmark, gRandom, gSystem
+import ctypes
 
 def plot_mc_data(outname,list1,list2):
 	pname=outname
@@ -13,16 +16,13 @@ def plot_mc_data(outname,list1,list2):
 
 	histos=[]
 	for p,title,color in pList:
+		print(p,title,color)
 		histos.append( f1.Get(p) )
-		if "inc_nbjets" in histos[-1].GetName():
-			c.SetLogy()
-		histos[-1].SetLineWidth(2)
 		histos[-1].SetLineColor(color)
 		histos[-1].SetTitle(title)
 		histos[-1].DrawNormalized('Esame' if len(histos)>1 else 'E')
 	for p,title,color in pList2:
 		histos.append( f2.Get(p) )
-		histos[-1].SetLineWidth(2)
 		histos[-1].SetLineColor(color)
 		histos[-1].SetTitle(title)
 		histos[-1].DrawNormalized('hist same' if len(histos)>1 else 'hist')
@@ -40,7 +40,13 @@ f2=ROOT.TFile.Open(sys.argv[2])
 
 
 hist_list = os.popen('rootls -1 '+sys.argv[1]).read().split('\n')
-print(hist_list[1])
+hist_list = list(filter(None, hist_list))
+print("first file contents:")
+print(hist_list)
+hist_list2 = os.popen('rootls -1 '+sys.argv[2]).read().split('\n')
+hist_list2 = list(filter(None, hist_list2))
+print("second file contents:")
+print(hist_list2)
 
 for x in hist_list:
 	pname = x

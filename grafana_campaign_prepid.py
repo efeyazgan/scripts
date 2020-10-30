@@ -24,6 +24,7 @@ payload_query = {
           "query_string": {
             "analyze_wildcard": True,
             #"query": "Type:production AND Status:Completed AND Campaign:\"RunIISummer19UL16GEN\" AND WMAgent_SubTaskName:/.*GEN.*/"
+            #query": "Type:production AND Status:Completed AND Campaign:\"RunIISummer19UL16GEN\" AND WMAgent_SubTaskName:/.*GEN.*/ AND (NOT WMAgent_SubTaskName:/.*DIGI.*/)"
             "query": "Type:production AND Status:Completed AND Campaign:\"RunIISummer19UL16GEN\""
           }
         }

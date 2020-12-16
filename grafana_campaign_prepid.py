@@ -23,9 +23,11 @@ payload_query = {
         {
           "query_string": {
             "analyze_wildcard": True,
-            #"query": "Type:production AND Status:Completed AND Campaign:\"RunIISummer19UL16GEN\" AND WMAgent_SubTaskName:/.*GEN.*/"
-            #query": "Type:production AND Status:Completed AND Campaign:\"RunIISummer19UL16GEN\" AND WMAgent_SubTaskName:/.*GEN.*/ AND (NOT WMAgent_SubTaskName:/.*DIGI.*/)"
-            "query": "Type:production AND Status:Completed AND Campaign:\"RunIISummer19UL16GEN\""
+            #"query": "Type:production AND Status:Completed AND Campaign:\"RunIISummer19UL17wmLHEGEN\" AND WMAgent_SubTaskName:/.*GEN.*/"
+            "query": "Type:production AND Status:Completed AND Campaign:\"RunIISummer19UL17GEN\" AND WMAgent_SubTaskName:/.*GEN.*/ AND (NOT WMAgent_SubTaskName:/.*DIGI.*/) AND (NOT WMAgent_SubTaskName:/.*SIM.*/) AND (NOT WMAgent_SubTaskName:/.*RECO.*/) AND (NOT WMAgent_SubTaskName:/.*AOD.*/) AND (NOT WMAgent_SubTaskName:/.*MINIAOD.*/)"
+            #"query": "Type:production AND Status:Completed AND Campaign:\"RunIISummer19UL17GEN\""
+            #"query": "Type:production AND Status:Completed AND Campaign:\"RunIISummer19UL17wmLHEGEN\""
+            #"query": "Type:production AND Status:Completed AND Campaign:\"RunIIFall17GS\""
           }
         }
       ]
@@ -85,7 +87,8 @@ for response in result["responses"]:
             #print("Campaign: " + campaign["key"] + " SubTask: " + sub_task["key"], " ")
             #print("SubTask: ",str(sub_task["key"]).split("/")[2]," HS06CoreHr", sub_task["agg_sum_of_HS06CoreHr"]["value"])
             newtuple = str(sub_task["key"]).split("/")[2]+" = "+str(sub_task["agg_sum_of_HS06CoreHr"]["value"])
-            list_prepid_hs06.append(newtuple)
+            if "GEN" in newtuple:
+            	list_prepid_hs06.append(newtuple)
 #        for sub_task in campaign["agg_sub_task_name"]["buckets"]:
 
 grouped={}
@@ -93,11 +96,16 @@ for x in list_prepid_hs06:
     key = x.partition('_')[0]
     grouped.setdefault(key,[]).append(x)
 grouped=grouped.values()
+final_sum_for_campaign = 0
 for x in grouped:
     total_hs06 = 0
     for y in x:
         listtmp = y.split(" = ")
         total_hs06 += float(listtmp[1])
         print(y)
-    print("total Hs06=",total_hs06)
+    print("total Hs06(hr)=",total_hs06)
     print("----------------------------------------------------------------------------")
+    final_sum_for_campaign += total_hs06
+print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+print("Total HS06(hr) for the GEN campaign = ",final_sum_for_campaign)
+print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")

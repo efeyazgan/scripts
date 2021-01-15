@@ -6,9 +6,11 @@ import subprocess, sys, shlex
 main_path = '/tmp/efe/'
 directory = r'/cvmfs/cms.cern.ch/phys_generator/gridpacks/UL/13TeV/madgraph/V5_2.6.5/g2HDM/ttc/'
 for filename in os.listdir(directory):
-    newdir = str(random.randint(500,1000))
+    newdir = str(random.randint(1000,2000))
     os.mkdir(newdir)
     os.chdir(newdir)
+    sys.stdout = open('testlog','w')
+    print(filename)
     process = subprocess.Popen('tar xf '+os.path.join(directory, filename),
             stdout=subprocess.PIPE,
             shell=True)

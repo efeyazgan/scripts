@@ -4,11 +4,11 @@ import sys
 import os
 import json
 
-
-json1 = str(sys.argv[1])
-json2 = str(sys.argv[2])
 if len(sys.argv) != 3:
     print "Enter two json files to compare"
+    sys.exit()
+json1 = str(sys.argv[1])
+json2 = str(sys.argv[2])
 with open(json1) as j1:
     data1 = json.load(j1)
 with open(json2) as j2:

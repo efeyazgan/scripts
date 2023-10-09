@@ -5,7 +5,8 @@ import argparse
 import textwrap
 os.system('source /afs/cern.ch/cms/PPD/PdmV/tools/McM/getCookie.sh')
 os.system('cern-get-sso-cookie -u https://cms-pdmv.cern.ch/mcm/ -o ~/private/prod-cookie.txt --krb --reprocess')
-sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
+#sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/') #older version
+sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM-QA/')
 
 from rest import McM
 from json import dumps
